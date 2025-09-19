@@ -1,0 +1,27 @@
+{
+  "name": "export-docusaurus-pdf",
+  "version": "1.0.0",
+  "type": "module",
+  "bin": {
+    "docexport": "./bin.js"
+  },
+  "exports": {
+    ".": {
+      "import": "./src/exportToPdfForAll.js"
+    }
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": ">=16"
+  },
+  "author": "lidppp",
+  "license": "MIT",
+  "description": "",
+  "dependencies": {
+    "cac": "^6.7.14",
+    "pdf-lib": "^1.17.1",
+    "playwright": "^1.55.0"
+  }
+}
