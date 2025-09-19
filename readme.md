@@ -1,4 +1,9 @@
 # `export-docusaurus-pdf`
+[![npm](https://img.shields.io/npm/v/export-docusaurus-pdf?color=brightgreen)](https://www.npmjs.com/package/export-docusaurus-pdf)
+[![Node.js](https://img.shields.io/node/v/export-docusaurus-pdf?color=blue)](https://nodejs.org)
+[![License](https://img.shields.io/npm/l/export-docusaurus-pdf)](https://github.com/lidppp/export-docusaurus-pdf/blob/main/LICENSE)
+[![Downloads](https://img.shields.io/npm/dm/export-docusaurus-pdf)](https://www.npmjs.com/package/export-docusaurus-pdf)
+[![GitHub stars](https://img.shields.io/github/stars/lidppp/export-docusaurus-pdf?style=social)](https://github.com/lidppp/export-docusaurus-pdf)  
 
 A CLI and Node.js tool to export **Docusaurus-generated documentation websites** to PDF.
 
@@ -91,7 +96,7 @@ import { run } from 'export-docusaurus-pdf/src/exportToPdfForAll.js';
 ## Development
 
 ```
-git clone https://github.com/yourusername/export-docusaurus-pdf.git
+git clone https://github.com/lidppp/export-docusaurus-pdf.git
 cd export-docusaurus-pdf
 npm install
 node ./bin.js http://localhost:3000 -o ./out/dev.pdf
