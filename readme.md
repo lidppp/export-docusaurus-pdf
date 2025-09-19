@@ -1,28 +1,30 @@
 # `export-docusaurus-pdf`
 
-A simple CLI and Node.js library to export a web page or document from a URL into a PDF. Supports custom output paths and optional temporary file cleanup.
+A CLI and Node.js tool to export **Docusaurus-generated documentation websites** to PDF.
 
 ------
 
 ## Features
 
-- Export any `http`/`https` URL to PDF
-- CLI tool (`docexport`) for command-line usage
-- Programmatic API (`run` function) for Node.js scripts
+- Export pages from a Docusaurus site to PDF
+- CLI tool (`docexport`) for quick command-line usage
+- Node.js API (`run` function) for programmatic use
 - Supports custom output file paths
-- Optional cleaning of temporary files
-- Cross-platform (macOS, Windows, Linux)
-- Works with Node.js 16+
+- Optional temporary file cleanup
+- URL validation (only `http`/`https`)
+- Automatically creates output directories
 
 ------
 
 ## Installation
 
+Globally:
+
 ```
 npm install -g export-docusaurus-pdf
 ```
 
-Or locally:
+Locally:
 
 ```
 npm install export-docusaurus-pdf
@@ -38,80 +40,62 @@ docexport <url> [options]
 
 ### Options
 
-| Option                    | Description                                  |
-| ------------------------- | -------------------------------------------- |
-| `<url>`                   | The URL of the document to export (required) |
-| `-o, --output <filename>` | Output file path (default: `./output.pdf`)   |
-| `--no-clean`              | Do not clean temporary files after export    |
-| `-V, --version`           | Show the CLI version                         |
-| `-h, --help`              | Show help information                        |
+| Option                    | Description                                    |
+| ------------------------- | ---------------------------------------------- |
+| `<url>`                   | URL of your Docusaurus site (required)         |
+| `-o, --output <filename>` | Output PDF file path (default: `./output.pdf`) |
+| `--no-clean`              | Do not clean temporary files                   |
+| `-V, --version`           | Show CLI version                               |
+| `-h, --help`              | Show help                                      |
 
 ### Examples
 
-Export a webpage to the default `output.pdf`:
+Export your Docusaurus site to the default `output.pdf`:
 
 ```
-docexport https://example.com
+docexport http://localhost:3000
 ```
 
-Export and specify an output path:
+Export to a custom path:
 
 ```
-docexport https://example.com -o ./out/mydoc.pdf
+docexport http://localhost:3000 -o ./out/docs.pdf
 ```
 
 Export without cleaning temporary files:
 
 ```
-docexport https://example.com --no-clean
+docexport http://localhost:3000 --no-clean
 ```
 
 ------
 
 ## Programmatic Usage
 
-You can also import the library directly in your Node.js project:
-
 ```
 import { run } from 'export-docusaurus-pdf/src/exportToPdfForAll.js';
 
 (async () => {
-  const url = 'https://example.com';
-  const output = './out/mydoc.pdf';
-  const clean = true; // set false to keep temporary files
+  const url = 'http://localhost:3000';
+  const output = './out/docs.pdf';
+  const clean = true;
 
   await run(url, output, clean);
 })();
 ```
 
-> **Note:** Node.js 16+ is recommended.
+> **Note:** Only works with Docusaurus-generated documentation. Node.js 16+ is recommended.
 
 ------
 
 ## Development
 
-Clone the repository:
-
 ```
 git clone https://github.com/yourusername/export-docusaurus-pdf.git
 cd export-docusaurus-pdf
 npm install
+node ./bin.js http://localhost:3000 -o ./out/dev.pdf
 ```
-
-Run CLI in development:
-
-```
-node ./bin.js https://example.com -o ./out/dev.pdf
-```
-
-------
-
-## Notes
-
-- Only `http` and `https` URLs are supported.
-- Output directories will be automatically created if they don’t exist.
-- Temporary files are cleaned by default unless `--no-clean` is passed.
-- CLI version is read from `package.json`.
 
 ------
 

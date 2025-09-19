@@ -1,15 +1,24 @@
 {
   "name": "export-docusaurus-pdf",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
+  "description": "Export Docusaurus-generated documentation websites to PDF via CLI or Node.js API",
+  "main": "./src/exportToPdfForAll.js",
   "bin": {
     "docexport": "./bin.js"
   },
-  "exports": {
-    ".": {
-      "import": "./src/exportToPdfForAll.js"
-    }
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lidppp/export-docusaurus-pdf.git"
   },
+  "homepage": "https://github.com/lidppp/export-docusaurus-pdf.git#readme",
+  "keywords": [
+    "docusaurus",
+    "pdf",
+    "export",
+    "cli",
+    "documentation"
+  ],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -18,7 +27,6 @@
   },
   "author": "lidppp",
   "license": "MIT",
-  "description": "",
   "dependencies": {
     "cac": "^6.7.14",
     "pdf-lib": "^1.17.1",
