@@ -9,23 +9,45 @@ const tempDir = path.resolve(process.cwd(), `pdfsTemp${randomString}`);
 let outputDir = path.resolve(process.cwd());
 let outputFileName = "output.pdf"
 
+async function findSubSidebar (page, level) {
+  const openItem = page.locator(`.theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-${level}:not(.menu__list-item--collapsed)`)
+  const subItem = openItem.locator(`.theme-doc-sidebar-item-category-level-${level + 1} .menu__list-item-collapsible`)
+  const subItemCount = await subItem.count();
+  for (let i = 0; i < subItemCount; i++) {
+    const itemClass = await subItem.nth(i).getAttribute('class')
+    if (itemClass.indexOf("menu__list-item-collapsible--active") > -1) {
+      await findSubSidebar(page, level + 1)
+      continue;
+    }
+    await subItem.nth(i).click();
+    await page.waitForTimeout(500);
+    await findSubSidebar(page, level + 1)
+  }
+}
+
 async function getAllLinks (page) {
   console.log("Wait page load")
   await page.goto(baseUrl)
   await page.waitForTimeout(2000);
   console.log("Page loaded. Get ul tag start.")
-  const ulItem = page.locator(".menu__list-item-collapsible")
+  const ulItem = page.locator(".theme-doc-sidebar-item-category-level-1 > .menu__list-item-collapsible")
   const ulCount = await ulItem.count();
 
   console.log("Get ul tag num: ", ulCount)
   for (let i = 0; i < ulCount; i++) {
     console.log("Click ul tag index: ", i);
+    const itemClass = await ulItem.nth(i).getAttribute('class')
+    if (itemClass.indexOf("menu__list-item-collapsible--active") > -1) {
+      await findSubSidebar(page, 1)
+      continue;
+    }
     await ulItem.nth(i).click();
     await page.waitForTimeout(500);
+    await findSubSidebar(page, 1)
   }
   console.log("Ul tag click finish")
   console.log("Get page hrefs start")
-  let hrefs = await page.$$eval('.theme-doc-sidebar-item-link a', as => as.map(a => a.href));
+  let hrefs = await page.$$eval('a.menu__link', as => as.map(a => a.href));
 
   console.log("Get page hrefs finish", hrefs);
   return hrefs
@@ -45,10 +67,30 @@ async function exportPdfToTempDir (page, paths) {
     console.log(`Export [${item.url}] start`);
     await page.goto(item.url, { waitUntil: 'networkidle' });
     console.log(`Go Page [${item.url}] successful`);
+    await page.addStyleTag({
+      content: `
+        .col--6 {
+          --ifm-col-width: calc(12 / 12 * 100%);
+        }
+        code[class*="codeBlockLines_"]{
+           white-space: pre-wrap !important;
+        }
+      `,
+    });
+    await page.waitForTimeout(200);
     const height = await page.evaluate(() =>
       document.querySelector("#__docusaurus_skipToContent_fallback").offsetHeight + 60
     );
+    const docCardListItem = page.locator("article > section.row > article[class*=docCardListItem]")
+    const docCardListItemCount = await docCardListItem.count();
 
+    const pageContent = page.locator('article > section.row > *')
+    const pageContentCount = await pageContent.count();
+
+    if (docCardListItemCount > 0 && docCardListItemCount == pageContentCount) {
+      console.log(`Skip Export [${item.url}] because it is doc list page`);
+      continue
+    }
     const outputPath = path.join(outputDir, item.fileName);
     await page.pdf({
       path: outputPath,
@@ -83,7 +125,7 @@ async function mergePDF (sourceFiles) {
   for (let i = 0; i < sourceFiles.length; i++) {
     const localPath = sourceFiles[i]
     const PDFItem = await PDFDocument.load(fs.readFileSync(localPath))
-    // for(let j = 0;j<PDFItem.getPageCount();j++) {
+    // for (let j = 0; j < PDFItem.getPageCount(); j++) {
     //   const [PDFPageItem] = await pdfDoc.copyPages(PDFItem, [j])
     //   pdfDoc.addPage(PDFPageItem)
     // }

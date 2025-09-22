@@ -30,7 +30,6 @@ cli
       process.exit(1);
     }
 
-    console.log(options)
     let output = options.output || "./output.pdf";
     output = path.resolve(process.cwd(), output);
     const dir = path.dirname(output);
