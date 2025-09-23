@@ -155,7 +155,7 @@ export async function run (url, _outputDir = "./output.pdf", needClean = true) {
   outputFileName = path.basename(_outputDir)
   const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext({
-    viewport: { width: 720 / 0.75 + 300, height: 1400 }
+    viewport: { width: 720 / 0.75 + 300, height: 400 }
   });
   try {
     const page = await context.newPage();
