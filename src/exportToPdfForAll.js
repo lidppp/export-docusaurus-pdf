@@ -9,19 +9,18 @@ const tempDir = path.resolve(process.cwd(), `pdfsTemp${randomString}`);
 let outputDir = path.resolve(process.cwd());
 let outputFileName = "output.pdf"
 
-async function findSubSidebar (page, level) {
-  const openItem = page.locator(`.theme-doc-sidebar-item-category.theme-doc-sidebar-item-category-level-${level}:not(.menu__list-item--collapsed)`)
-  const subItem = openItem.locator(`.theme-doc-sidebar-item-category-level-${level + 1} .menu__list-item-collapsible`)
+async function findSubSidebar (parent, level, page) {
+  const subItem = parent.locator(`.theme-doc-sidebar-item-category-level-${level + 1} .menu__list-item-collapsible`)
   const subItemCount = await subItem.count();
   for (let i = 0; i < subItemCount; i++) {
     const itemClass = await subItem.nth(i).getAttribute('class')
     if (itemClass.indexOf("menu__list-item-collapsible--active") > -1) {
-      await findSubSidebar(page, level + 1)
+      await findSubSidebar(subItem.nth(i).locator("xpath=.."), level + 1, page)
       continue;
     }
     await subItem.nth(i).click();
     await page.waitForTimeout(500);
-    await findSubSidebar(page, level + 1)
+    await findSubSidebar(subItem.nth(i).locator("xpath=.."), level + 1, page)
   }
 }
 
@@ -38,16 +37,16 @@ async function getAllLinks (page) {
     console.log("Click ul tag index: ", i);
     const itemClass = await ulItem.nth(i).getAttribute('class')
     if (itemClass.indexOf("menu__list-item-collapsible--active") > -1) {
-      await findSubSidebar(page, 1)
+      await findSubSidebar(ulItem.nth(i).locator("xpath=.."), 1, page)
       continue;
     }
     await ulItem.nth(i).click();
     await page.waitForTimeout(500);
-    await findSubSidebar(page, 1)
+    await findSubSidebar(ulItem.nth(i).locator("xpath=.."), 1, page)
   }
   console.log("Ul tag click finish")
   console.log("Get page hrefs start")
-  let hrefs = await page.$$eval('a.menu__link', as => as.map(a => a.href));
+  let hrefs = await page.$$eval("a.menu__link:not([class*=menuExternalLink])", as => as.map(a => a.href));
 
   console.log("Get page hrefs finish", hrefs);
   return hrefs
@@ -154,9 +153,9 @@ export async function run (url, _outputDir = "./output.pdf", needClean = true) {
   baseUrl = url;
   outputDir = path.resolve(process.cwd(), path.dirname(_outputDir));
   outputFileName = path.basename(_outputDir)
-  const browser = await chromium.launch({ headless: true });
+  const browser = await chromium.launch({ headless: false });
   const context = await browser.newContext({
-    viewport: { width: 720 / 0.75 + 300, height: 400 }
+    viewport: { width: 720 / 0.75 + 300, height: 1400 }
   });
   try {
     const page = await context.newPage();
@@ -165,11 +164,11 @@ export async function run (url, _outputDir = "./output.pdf", needClean = true) {
     console.log('Docusaurus is running');
     console.log('---------------------');
     const links = await getAllLinks(page)
-    const tmpFilesPath = await exportPdfToTempDir(page, links)
-    await mergePDF(tmpFilesPath)
-    if (needClean) {
-      clearTempFiles()
-    }
+    // const tmpFilesPath = await exportPdfToTempDir(page, links)
+    // await mergePDF(tmpFilesPath)
+    // if (needClean) {
+    //   clearTempFiles()
+    // }
   } catch (err) {
     console.error('Export failed: \n', err);
     process.exitCode = 1;
