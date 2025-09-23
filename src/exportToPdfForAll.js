@@ -55,7 +55,7 @@ async function getAllLinks (page) {
 async function exportPdfToTempDir (page, paths) {
   const outputDir = tempDir;
   if (!fs.existsSync(outputDir)) {
-    fs.mkdirSync(outputDir, { recursive: true });
+    fs.mkdirSync(outputDir, { recursive: false });
   }
   const exportFiles = []
   for (let i = 0; i < paths.length; i++) {
@@ -164,11 +164,11 @@ export async function run (url, _outputDir = "./output.pdf", needClean = true) {
     console.log('Docusaurus is running');
     console.log('---------------------');
     const links = await getAllLinks(page)
-    // const tmpFilesPath = await exportPdfToTempDir(page, links)
-    // await mergePDF(tmpFilesPath)
-    // if (needClean) {
-    //   clearTempFiles()
-    // }
+    const tmpFilesPath = await exportPdfToTempDir(page, links)
+    await mergePDF(tmpFilesPath)
+    if (needClean) {
+      clearTempFiles()
+    }
   } catch (err) {
     console.error('Export failed: \n', err);
     process.exitCode = 1;
